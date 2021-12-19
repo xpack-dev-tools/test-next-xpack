@@ -1,0 +1,29 @@
+{
+  "configurations": [
+    {
+      "name": "darwin-arm64"
+    },
+    {
+      "name": "darwin-x64"
+    },
+    {
+      "name": "linux-arm"
+    },
+    {
+      "name": "linux-arm64"
+    },
+    {
+      "name": "linux-x64"
+    },
+    {
+      "name": "win32-x64"
+    },
+    {
+      "name": "debug"
+    },
+    {
+      "name": "release"
+    }
+  ],
+  "version": 4
+}

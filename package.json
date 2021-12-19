@@ -1,0 +1,206 @@
+{
+  "name": "@xpack-dev-tools/test-next",
+  "version": "0.1.0",
+  "description": "A binary xPack to test the new build procedure",
+  "main": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xpack-dev-tools/test-next-xpack.git"
+  },
+  "bugs": {
+    "url": "https://github.com/xpack-dev-tools/test-next-xpack/issues/"
+  },
+  "homepage": "https://github.com/xpack-dev-tools/test-next-xpack/",
+  "keywords": [
+    "xpack"
+  ],
+  "author": {
+    "name": "Liviu Ionescu",
+    "email": "ilg@livius.net",
+    "url": "https://github.com/ilg-ul/"
+  },
+  "license": "MIT",
+  "config": {},
+  "dependencies": {},
+  "xpack": {
+    "minimumXpmRequired": "0.10.8",
+    "binaries": {
+      "destination": "./.content",
+      "baseUrl": "https://github.com/xpack-dev-tools/test-next-xpack/releases/download/v6.1.0-1",
+      "skip": 1,
+      "platforms": {
+        "darwin-arm64": {
+          "fileName": "xpack-test-next-6.1.0-1-darwin-arm64.tar.gz",
+          "sha256": "9001c6befdd791f814d9c64b903915ab10983d9c80659a6d4e811290759159b7"
+        },
+        "darwin-x64": {
+          "fileName": "xpack-test-next-6.1.0-1-darwin-x64.tar.gz",
+          "sha256": "9001c6befdd791f814d9c64b903915ab10983d9c80659a6d4e811290759159b7"
+        },
+        "linux-arm64": {
+          "fileName": "xpack-test-next-6.1.0-1-linux-arm64.tar.gz",
+          "sha256": "386abf59c78b3b840314ddcbdad42086ef88e9d3197c44201460c0e78b094a3e"
+        },
+        "linux-arm": {
+          "fileName": "xpack-test-next-6.1.0-1-linux-arm.tar.gz",
+          "sha256": "b1b1046365ecd0d72cbb1c7d18df1451595347f454bfc6ed9fc99d3ced133ac3"
+        },
+        "linux-x64": {
+          "fileName": "xpack-test-next-6.1.0-1-linux-x64.tar.gz",
+          "sha256": "b99b87541f13e594f09f6a8ce656d84e0c0ac9623227ee6f2ba2a46c7e67a350"
+        },
+        "win32-x64": {
+          "fileName": "xpack-test-next-6.1.0-1-win32-x64.zip",
+          "sha256": "c7c35e03a3c861b5f21d8564074cb928f1478eeb2c8a2e8ee53e7513c39e2750"
+        }
+      }
+    },
+    "bin": {
+      "test-next": "./.content/bin/test-next"
+    },
+    "properties": {
+      "appName": "Test Next",
+      "appLCName": "test-next",
+      "platforms": "linux-x64,linux-arm64,linux-arm,darwin-x64,darwin-arm64,win32-x64",
+      "LIQUIDJS": "liquidjs '{ \"APP_NAME\": \"{{ properties.appName }}\", \"APP_LC_NAME\": \"{{ properties.appLCName }}\", \"platforms\": \"{{ properties.platforms }}\" }'",
+      "buildFolderRelativePath": "{{ 'targets' | path_join: configuration.name | to_filename | downcase }}",
+      "buildFolderPath": "$(pwd)/{{ properties.buildFolderRelativePath }}",
+      "commandBuild": "bash scripts/helper/build.sh --build-folder \"{{ properties.buildFolderPath }}\"",
+      "commandBuildWithTarget": "bash scripts/helper/build.sh --target-folder \"{{ properties.buildFolderPath }}\" --target {{ configuration.name }}",
+      "commandClean": "rm -rf \"{{ properties.buildFolderPath }}\""
+    },
+    "actions": {
+      "generate-workflows": [
+        "mkdir -p .github/workflows/",
+        "cp scripts/helper/templates/body-github-pre-releases-test.md .github/workflows/",
+        "cat scripts/helper/templates/build-liquid.yml | {{ properties.LIQUIDJS }} > .github/workflows/build-all.yml",
+        "cat scripts/helper/templates/build-xbbli-liquid.yml | {{ properties.LIQUIDJS }} > .github/workflows/build-xbbli.yml",
+        "cat scripts/helper/templates/build-xbbla-liquid.yml | {{ properties.LIQUIDJS }} > .github/workflows/build-xbbla.yml",
+        "cat scripts/helper/templates/build-xbbmi-liquid.yml | {{ properties.LIQUIDJS }} > .github/workflows/build-xbbmi.yml",
+        "cat scripts/helper/templates/build-xbbma-liquid.yml | {{ properties.LIQUIDJS }} > .github/workflows/build-xbbma.yml",
+        "cat scripts/helper/templates/test-prime-liquid.yml | {{ properties.LIQUIDJS }} > .github/workflows/test-prime.yml",
+        "cat scripts/helper/templates/test-docker-linux-intel-liquid.yml | {{ properties.LIQUIDJS }} > .github/workflows/test-docker-linux-intel.yml",
+        "cat scripts/helper/templates/test-docker-linux-arm-liquid.yml | {{ properties.LIQUIDJS }} > .github/workflows/test-docker-linux-arm.yml",
+        "cat scripts/helper/templates/publish-release-liquid.yml | {{ properties.LIQUIDJS }} > .github/workflows/publish-release.yml",
+        "cat scripts/helper/templates/test-xpm-liquid.yml | {{ properties.LIQUIDJS }} > .github/workflows/test-xpm.yml"
+      ],
+      "trigger-workflow-build-all": "bash scripts/helper/trigger-workflow-build.sh",
+      "trigger-workflow-build-xbbli": "bash scripts/helper/trigger-workflow-build.sh --machine xbbli",
+      "trigger-workflow-build-xbbla": "bash scripts/helper/trigger-workflow-build.sh --machine xbbla",
+      "trigger-workflow-build-xbbmi": "bash scripts/helper/trigger-workflow-build.sh --machine xbbmi",
+      "trigger-workflow-build-xbbma": "bash scripts/helper/trigger-workflow-build.sh --machine xbbma",
+      "trigger-workflow-test-prime": "bash scripts/helper/tests/trigger-workflow-test-prime.sh",
+      "trigger-workflow-test-docker-linux-intel": "bash scripts/helper/tests/trigger-workflow-test-docker-linux-intel.sh",
+      "trigger-workflow-test-docker-linux-arm": "bash scripts/helper/tests/trigger-workflow-test-docker-linux-arm.sh",
+      "trigger-travis-macos": "bash scripts/helper/tests/trigger-travis-macos.sh",
+      "trigger-workflow-publish-release": "bash scripts/helper/trigger-workflow-publish-release.sh",
+      "generate-jekyll-post": "bash scripts/helper/generate-jekyll-post.sh",
+      "update-package-binaries": "bash scripts/helper/update-package-binaries.sh",
+      "trigger-workflow-test-xpm": "bash scripts/helper/tests/trigger-workflow-test-xpm.sh"
+    },
+    "buildConfigurations": {
+      "debug": {
+        "actions": {
+          "build": [
+            "{{ properties.commandBuild }} --debug"
+          ],
+          "clean": [
+            "{{ properties.commandClean }}"
+          ]
+        }
+      },
+      "release": {
+        "actions": {
+          "build": [
+            "{{ properties.commandBuild }}"
+          ],
+          "clean": [
+            "{{ properties.commandClean }}"
+          ]
+        }
+      },
+      "darwin-arm64": {
+        "actions": {
+          "build": [
+            "{{ properties.commandBuildWithTarget }}"
+          ],
+          "clean": [
+            "{{ properties.commandClean }}"
+          ]
+        },
+        "devDependencies": {
+        }
+      },
+      "darwin-x64": {
+        "actions": {
+          "build": [
+            "{{ properties.commandBuildWithTarget }}"
+          ],
+          "clean": [
+            "{{ properties.commandClean }}"
+          ]
+        },
+        "devDependencies": {
+        }
+      },
+      "linux-arm": {
+        "actions": {
+          "build": [
+            "{{ properties.commandBuildWithTarget }}"
+          ],
+          "clean": [
+            "{{ properties.commandClean }}"
+          ]
+        },
+        "devDependencies": {
+        }
+      },
+      "linux-arm64": {
+        "actions": {
+          "build": [
+            "{{ properties.commandBuildWithTarget }}"
+          ],
+          "clean": [
+            "{{ properties.commandClean }}"
+          ]
+        },
+        "devDependencies": {
+        }
+      },
+      "linux-x64": {
+        "actions": {
+          "build": [
+            "{{ properties.commandBuildWithTarget }}"
+          ],
+          "clean": [
+            "{{ properties.commandClean }}"
+          ]
+        },
+        "devDependencies": {
+        }
+      },
+      "win32-x64": {
+        "actions": {
+          "build": [
+            "{{ properties.commandBuildWithTarget }}"
+          ],
+          "clean": [
+            "{{ properties.commandClean }}"
+          ]
+        },
+        "devDependencies": {
+        }
+      }
+    }
+  },
+  "bundleDependencies": [],
+  "devDependencies": {
+    "liquidjs": "^9.25.1",
+    "@xpack-dev-tools/gcc": "8.5.0-1.1",
+    "@xpack-dev-tools/cmake": "3.20.6-2.1",
+    "@xpack-dev-tools/ninja-build": "1.10.2-5.1"
+  }
+}
