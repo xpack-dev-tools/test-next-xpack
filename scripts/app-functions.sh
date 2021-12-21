@@ -28,6 +28,9 @@ function build_test_next()
       mkdir -p "${BUILD_FOLDER_PATH}/${test_next_folder_name}"
       cd "${BUILD_FOLDER_PATH}/${test_next_folder_name}"
 
+      # Used to set LD_LIBRARY_PATH
+      xbb_activate_installed_dev
+      
       CFLAGS="-pipe"
       CXXFLAGS="-pipe"
 
