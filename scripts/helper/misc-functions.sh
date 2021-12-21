@@ -20,6 +20,78 @@ function realpath()
 
 # -----------------------------------------------------------------------------
 
+# For the XBB builds, add the freshly built binaries.
+function xbb_activate_installed_bin()
+{
+  # Add the XBB bin to the PATH.
+  if [ -z "${PATH:-""}" ]
+  then
+    PATH="${INSTALL_FOLDER_PATH}/usr/sbin:${INSTALL_FOLDER_PATH}/usr/bin:${INSTALL_FOLDER_PATH}/sbin:${INSTALL_FOLDER_PATH}/bin"
+  else
+    PATH="${INSTALL_FOLDER_PATH}/usr/sbin:${INSTALL_FOLDER_PATH}/usr/bin:${INSTALL_FOLDER_PATH}/sbin:${INSTALL_FOLDER_PATH}/bin:${PATH}"
+  fi
+
+  export PATH
+}
+
+# For the XBB builds, add the freshly built headrs and libraries.
+function xbb_activate_installed_dev()
+{
+  # Add XBB include in front of XBB_CPPFLAGS.
+  XBB_CPPFLAGS="-I${INSTALL_FOLDER_PATH}/include ${XBB_CPPFLAGS}"
+
+  if [ -d "${INSTALL_FOLDER_PATH}/lib" ]
+  then
+    # Add XBB lib in front of XBB_LDFLAGS.
+    XBB_LDFLAGS="-L${INSTALL_FOLDER_PATH}/lib ${XBB_LDFLAGS}"
+    XBB_LDFLAGS_LIB="-L${INSTALL_FOLDER_PATH}/lib ${XBB_LDFLAGS_LIB}"
+    XBB_LDFLAGS_LIB_STATIC_GCC="-L${INSTALL_FOLDER_PATH}/lib ${XBB_LDFLAGS_LIB_STATIC_GCC}"
+    XBB_LDFLAGS_APP="-L${INSTALL_FOLDER_PATH}/lib ${XBB_LDFLAGS_APP}"
+    XBB_LDFLAGS_APP_STATIC="-L${INSTALL_FOLDER_PATH}/lib ${XBB_LDFLAGS_APP_STATIC}"
+    XBB_LDFLAGS_APP_STATIC_GCC="-L${INSTALL_FOLDER_PATH}/lib ${XBB_LDFLAGS_APP_STATIC_GCC}"
+
+    # Add XBB lib in front of PKG_CONFIG_PATH.
+    if [ -z "${PKG_CONFIG_PATH}" ]
+    then
+      PKG_CONFIG_PATH="${INSTALL_FOLDER_PATH}/lib/pkgconfig"
+    else
+      PKG_CONFIG_PATH="${INSTALL_FOLDER_PATH}/lib/pkgconfig:${PKG_CONFIG_PATH}"
+    fi
+  fi
+
+  # If lib64 present and not link, add it in front of lib.
+  if [ -d "${INSTALL_FOLDER_PATH}/lib64" -a ! -L "${INSTALL_FOLDER_PATH}/lib64" ]
+  then
+    XBB_LDFLAGS="-L${INSTALL_FOLDER_PATH}/lib64 ${XBB_LDFLAGS}"
+    XBB_LDFLAGS_LIB="-L${INSTALL_FOLDER_PATH}/lib64 ${XBB_LDFLAGS_LIB}"
+    XBB_LDFLAGS_LIB_STATIC_GCC="-L${INSTALL_FOLDER_PATH}/lib64 ${XBB_LDFLAGS_LIB_STATIC_GCC}"
+    XBB_LDFLAGS_APP="-L${INSTALL_FOLDER_PATH}/lib64 ${XBB_LDFLAGS_APP}"
+    XBB_LDFLAGS_APP_STATIC="-L${INSTALL_FOLDER_PATH}/lib64 ${XBB_LDFLAGS_APP_STATIC}"
+    XBB_LDFLAGS_APP_STATIC_GCC="-L${INSTALL_FOLDER_PATH}/lib64 ${XBB_LDFLAGS_APP_STATIC_GCC}"
+
+    # Add XBB lib in front of PKG_CONFIG_PATH.
+    if [ -z "${PKG_CONFIG_PATH}" ]
+    then
+      PKG_CONFIG_PATH="${INSTALL_FOLDER_PATH}/lib64/pkgconfig"
+    else
+      PKG_CONFIG_PATH="${INSTALL_FOLDER_PATH}/lib64/pkgconfig:${PKG_CONFIG_PATH}"
+    fi
+  fi
+
+  export XBB_CPPFLAGS
+
+  export XBB_LDFLAGS
+  export XBB_LDFLAGS_LIB
+  export XBB_LDFLAGS_LIB_STATIC_GCC
+  export XBB_LDFLAGS_APP
+  export XBB_LDFLAGS_APP_STATIC
+  export XBB_LDFLAGS_APP_STATIC_GCC
+
+  export PKG_CONFIG_PATH
+}
+
+# -----------------------------------------------------------------------------
+
 function start_timer()
 {
   BUILD_BEGIN_SECOND=$(date +%s)
