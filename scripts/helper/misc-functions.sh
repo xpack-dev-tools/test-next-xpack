@@ -12,17 +12,6 @@
 
 # -----------------------------------------------------------------------------
 
-# Local hack to avoid a dependency to realpath(1).
-if false
-then
-  function realpath()
-  {
-    python3 -c "import os,sys; print(os.path.realpath(sys.argv[1]))" "$1"
-  }
-fi
-
-# -----------------------------------------------------------------------------
-
 # For the XBB builds, add the freshly built binaries.
 function xbb_activate_installed_bin()
 {
