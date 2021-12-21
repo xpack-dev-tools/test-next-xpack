@@ -13,10 +13,13 @@
 # -----------------------------------------------------------------------------
 
 # Local hack to avoid a dependency to realpath(1).
+if false
+then
 function realpath()
 {
   python3 -c "import os,sys; print(os.path.realpath(sys.argv[1]))" "$1"
 }
+fi
 
 # -----------------------------------------------------------------------------
 
