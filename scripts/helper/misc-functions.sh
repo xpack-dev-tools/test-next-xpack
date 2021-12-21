@@ -121,6 +121,173 @@ function ndate()
 
 # -----------------------------------------------------------------------------
 
+function download_and_extract()
+{
+  local url="$1"
+  local archive_name="$2"
+  # Must be exactly what results from expanding the archive.
+  local folder_name="$3"
+
+  if [ ! -d "${folder_name}" ]
+  then
+    download "${url}" "${archive_name}"
+    if [ $# -ge 4 ]
+    then
+      extract "${DOWNLOAD_FOLDER_PATH}/${archive_name}" "${folder_name}" "$4"
+    else
+      extract "${DOWNLOAD_FOLDER_PATH}/${archive_name}" "${folder_name}"
+    fi
+
+    chmod -R +w "${folder_name}" || true
+
+    local with_update_config_sub=${WITH_UPDATE_CONFIG_SUB:-""}
+    if [ "${with_update_config_sub}" == "y" ]
+    then
+      update_config_sub "${folder_name}"
+    fi
+  fi
+}
+
+function download()
+{
+  local url="$1"
+  local archive_name="$2"
+  local url_base="https://github.com/xpack-dev-tools/files-cache/raw/master/libs"
+
+  if [ ! -f "${CACHE_FOLDER_PATH}/${archive_name}" ]
+  then
+    (
+      for count in 1 2 3 4
+      do
+        if [ ${count} -eq 4 ]
+        then
+          local backup_url="${url_base}/$(basename "${url}")"
+          if try_download "${backup_url}" "${archive_name}"
+          then
+            break
+          else
+            echo "Several download attempts failed. Quit."
+            exit 1
+          fi
+        fi
+        if try_download "${url}" "${archive_name}"
+        then
+          break
+        fi
+      done
+
+      mv "${CACHE_FOLDER_PATH}/${archive_name}.download" "${CACHE_FOLDER_PATH}/${archive_name}"
+    )
+  else
+    echo "File \"${CACHE_FOLDER_PATH}/${archive_name}\" already downloaded."
+  fi
+}
+
+function try_download()
+{
+  local url="$1"
+  local archive_name="$2"
+  local exit_code
+
+  echo
+  echo "Downloading \"${archive_name}\" from \"${url}\"..."
+  rm -f "${CACHE_FOLDER_PATH}/${archive_name}.download"
+  mkdir -pv "${CACHE_FOLDER_PATH}"
+
+  set +e
+  run_verbose curl --fail --location --insecure -o "${CACHE_FOLDER_PATH}/${archive_name}.download" "${url}"
+  exit_code=$?
+  set -e
+
+  # return true for process exit code 0.
+  return ${exit_code}
+}
+
+function extract()
+{
+  local archive_name="$1"
+  # Must be exactly what results from expanding the archive.
+  local folder_name="$2"
+  # local patch_file_name="$3"
+  local pwd="$(pwd)"
+
+  if [ ! -d "${folder_name}" ]
+  then
+    (
+      echo
+      echo "Extracting \"${archive_name}\" -> \"${pwd}/${folder_name}\"..."
+      if [[ "${archive_name}" == *zip ]]
+      then
+        run_verbose unzip "${archive_name}"
+      else
+        run_verbose tar -x -f "${archive_name}" --no-same-owner || tar -x -f "${archive_name}" --no-same-owner
+      fi
+
+      if [ $# -ge 3 ]
+      then
+        cd "${folder_name}"
+        apply_patch "$3"
+      fi
+    )
+  else
+    echo "Folder \"${pwd}/${folder_name}\" already present."
+  fi
+}
+
+# If the file is a .patch.diff, use -p1, otherwise -p0.
+function apply_patch()
+{
+  if [ ! -z "$1" ]
+  then
+    local patch_path="$1"
+    if [ -f "${patch_path}" ]
+    then
+      echo "Applying \"${patch_path}\"..."
+      if [[ ${patch_path} == *.patch.diff ]]
+      then
+        # Sourcetree creates patch.diff files, which require -p1.
+        run_verbose patch -p1 < "${patch_path}"
+      else
+        # Manually created patches.
+        run_verbose patch -p0 < "${patch_path}"
+      fi
+    fi
+  fi
+}
+
+function update_config_sub()
+{
+  local folder_path="$1"
+
+  (
+    cd "${folder_path}"
+
+    find . -name 'config.sub' \
+      -exec cp -v "${helper_folder_path}/config.sub" "{}" \;
+  )
+}
+
+function git_clone()
+{
+  local url="$1"
+  local branch="$2"
+  local commit="$3"
+  local folder_name="$4"
+
+  (
+    echo
+    echo "Cloning \"${folder_name}\" from \"${url}\"..."
+    run_verbose git clone --branch="${branch}" "${url}" "${folder_name}"
+    if [ -n "${commit}" ]
+    then
+      cd "${folder_name}"
+      run_verbose git checkout -qf "${commit}"
+    fi
+  )
+}
+
+# -----------------------------------------------------------------------------
+
 function run_verbose()
 {
   # Does not include the .exe extension.
