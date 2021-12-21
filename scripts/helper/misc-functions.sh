@@ -15,10 +15,10 @@
 # Local hack to avoid a dependency to realpath(1).
 if false
 then
-function realpath()
-{
-  python3 -c "import os,sys; print(os.path.realpath(sys.argv[1]))" "$1"
-}
+  function realpath()
+  {
+    python3 -c "import os,sys; print(os.path.realpath(sys.argv[1]))" "$1"
+  }
 fi
 
 # -----------------------------------------------------------------------------
@@ -41,43 +41,45 @@ function xbb_activate_installed_bin()
 function xbb_activate_installed_dev()
 {
   # Add XBB include in front of XBB_CPPFLAGS.
-  XBB_CPPFLAGS="-I${INSTALL_FOLDER_PATH}/include ${XBB_CPPFLAGS}"
+  XBB_CPPFLAGS="-I${LIBS_INSTALL_FOLDER_PATH}/include ${XBB_CPPFLAGS}"
 
-  if [ -d "${INSTALL_FOLDER_PATH}/lib" ]
+  if [ -d "${LIBS_INSTALL_FOLDER_PATH}/lib" ]
   then
     # Add XBB lib in front of XBB_LDFLAGS.
-    XBB_LDFLAGS="-L${INSTALL_FOLDER_PATH}/lib ${XBB_LDFLAGS}"
-    XBB_LDFLAGS_LIB="-L${INSTALL_FOLDER_PATH}/lib ${XBB_LDFLAGS_LIB}"
-    XBB_LDFLAGS_LIB_STATIC_GCC="-L${INSTALL_FOLDER_PATH}/lib ${XBB_LDFLAGS_LIB_STATIC_GCC}"
-    XBB_LDFLAGS_APP="-L${INSTALL_FOLDER_PATH}/lib ${XBB_LDFLAGS_APP}"
-    XBB_LDFLAGS_APP_STATIC="-L${INSTALL_FOLDER_PATH}/lib ${XBB_LDFLAGS_APP_STATIC}"
-    XBB_LDFLAGS_APP_STATIC_GCC="-L${INSTALL_FOLDER_PATH}/lib ${XBB_LDFLAGS_APP_STATIC_GCC}"
+    XBB_LDFLAGS="-L${LIBS_INSTALL_FOLDER_PATH}/lib ${XBB_LDFLAGS}"
+    XBB_LDFLAGS_LIB="-L${LIBS_INSTALL_FOLDER_PATH}/lib ${XBB_LDFLAGS_LIB}"
+    XBB_LDFLAGS_APP="-L${LIBS_INSTALL_FOLDER_PATH}/lib ${XBB_LDFLAGS_APP}"
+    XBB_LDFLAGS_APP_STATIC_GCC="-L${LIBS_INSTALL_FOLDER_PATH}/lib ${XBB_LDFLAGS_APP_STATIC_GCC}"
 
     # Add XBB lib in front of PKG_CONFIG_PATH.
-    if [ -z "${PKG_CONFIG_PATH}" ]
+    PKG_CONFIG_PATH="${LIBS_INSTALL_FOLDER_PATH}/lib/pkgconfig:${PKG_CONFIG_PATH}"
+
+    # Needed by internal binaries, like the bootstrap compiler, which do not
+    # have a rpath.
+    if [ -z "${LD_LIBRARY_PATH}" ]
     then
-      PKG_CONFIG_PATH="${INSTALL_FOLDER_PATH}/lib/pkgconfig"
+      LD_LIBRARY_PATH="${LIBS_INSTALL_FOLDER_PATH}/lib"
     else
-      PKG_CONFIG_PATH="${INSTALL_FOLDER_PATH}/lib/pkgconfig:${PKG_CONFIG_PATH}"
+      LD_LIBRARY_PATH="${LIBS_INSTALL_FOLDER_PATH}/lib:${LD_LIBRARY_PATH}"
     fi
   fi
 
-  # If lib64 present and not link, add it in front of lib.
-  if [ -d "${INSTALL_FOLDER_PATH}/lib64" -a ! -L "${INSTALL_FOLDER_PATH}/lib64" ]
+  # Used by libffi, for example.
+  if [ -d "${LIBS_INSTALL_FOLDER_PATH}/lib64" ]
   then
-    XBB_LDFLAGS="-L${INSTALL_FOLDER_PATH}/lib64 ${XBB_LDFLAGS}"
-    XBB_LDFLAGS_LIB="-L${INSTALL_FOLDER_PATH}/lib64 ${XBB_LDFLAGS_LIB}"
-    XBB_LDFLAGS_LIB_STATIC_GCC="-L${INSTALL_FOLDER_PATH}/lib64 ${XBB_LDFLAGS_LIB_STATIC_GCC}"
-    XBB_LDFLAGS_APP="-L${INSTALL_FOLDER_PATH}/lib64 ${XBB_LDFLAGS_APP}"
-    XBB_LDFLAGS_APP_STATIC="-L${INSTALL_FOLDER_PATH}/lib64 ${XBB_LDFLAGS_APP_STATIC}"
-    XBB_LDFLAGS_APP_STATIC_GCC="-L${INSTALL_FOLDER_PATH}/lib64 ${XBB_LDFLAGS_APP_STATIC_GCC}"
+    # For 64-bit systems, add XBB lib64 in front of paths.
+    XBB_LDFLAGS="-L${LIBS_INSTALL_FOLDER_PATH}/lib64 ${XBB_LDFLAGS_LIB}"
+    XBB_LDFLAGS_LIB="-L${LIBS_INSTALL_FOLDER_PATH}/lib64 ${XBB_LDFLAGS_LIB}"
+    XBB_LDFLAGS_APP="-L${LIBS_INSTALL_FOLDER_PATH}/lib64 ${XBB_LDFLAGS_APP}"
+    XBB_LDFLAGS_APP_STATIC_GCC="-L${LIBS_INSTALL_FOLDER_PATH}/lib64 ${XBB_LDFLAGS_APP_STATIC_GCC}"
 
-    # Add XBB lib in front of PKG_CONFIG_PATH.
-    if [ -z "${PKG_CONFIG_PATH}" ]
+    PKG_CONFIG_PATH="${LIBS_INSTALL_FOLDER_PATH}/lib64/pkgconfig:${PKG_CONFIG_PATH}"
+
+    if [ -z "${LD_LIBRARY_PATH}" ]
     then
-      PKG_CONFIG_PATH="${INSTALL_FOLDER_PATH}/lib64/pkgconfig"
+      LD_LIBRARY_PATH="${LIBS_INSTALL_FOLDER_PATH}/lib64"
     else
-      PKG_CONFIG_PATH="${INSTALL_FOLDER_PATH}/lib64/pkgconfig:${PKG_CONFIG_PATH}"
+      LD_LIBRARY_PATH="${LIBS_INSTALL_FOLDER_PATH}/lib64:${LD_LIBRARY_PATH}"
     fi
   fi
 
@@ -85,12 +87,17 @@ function xbb_activate_installed_dev()
 
   export XBB_LDFLAGS
   export XBB_LDFLAGS_LIB
-  export XBB_LDFLAGS_LIB_STATIC_GCC
   export XBB_LDFLAGS_APP
-  export XBB_LDFLAGS_APP_STATIC
   export XBB_LDFLAGS_APP_STATIC_GCC
 
   export PKG_CONFIG_PATH
+  export LD_LIBRARY_PATH
+
+  if [ "${IS_DEVELOP}" == "y" ]
+  then
+    echo
+    env | sort
+  fi
 }
 
 # -----------------------------------------------------------------------------
