@@ -247,6 +247,8 @@ function set_build_env()
   # Use the UTC date as version in the name of the distribution file.
   DISTRIBUTION_FILE_DATE=${DISTRIBUTION_FILE_DATE:-$(date -u +%Y%m%d-%H%M)}
 
+  CACHE_FOLDER_PATH=${CACHE_FOLDER_PATH:-"${HOME}/Work/cache"}
+
   copy_build_git
 
   # ---------------------------------------------------------------------------
