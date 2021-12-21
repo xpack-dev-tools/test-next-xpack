@@ -9,12 +9,23 @@
 
 // ----------------------------------------------------------------------------
 
+#include "test-next.h"
 #include <iostream>
+#include <exception>
+
+void
+func(void);
+
+struct MyException : public std::exception {
+   const char* what() const throw () {
+      return "MyException";
+   }
+};
 
 int
 main (int argc, char* argv[])
 {
-  std::cout << "Hello from next build!" << std::endl;
+  std::cout << HELLO_WORLD_MESSAGE << std::endl;
 
 #if defined(DEBUG)
   std::cout << "(in debug mode)" << std::endl;
@@ -26,7 +37,22 @@ main (int argc, char* argv[])
   std::cout << "(no asserts)" << std::endl;
 #endif
 
+try {
+  func();
+} catch(MyException& e) {
+  std::cout << e.what() << std::endl;
+} catch(std::exception& e) {
+  std::cout << "Other" << std::endl;
+}
+
   return 0;
+}
+
+void
+func(void)
+{
+  // Do not use new, so the exception will be a local object, not a pointer.
+  throw MyException();
 }
 
 // ----------------------------------------------------------------------------

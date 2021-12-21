@@ -43,6 +43,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # -----------------------------------------------------------------------------
 
 get_filename_component(xpack_project_folder ${CMAKE_SOURCE_DIR} DIRECTORY)
+# set(xpack_project_folder ${CMAKE_SOURCE_DIR})
 
 # -----------------------------------------------------------------------------
 
@@ -55,7 +56,7 @@ message(STATUS "PATH: $ENV{PATH}")
 # -----------------------------------------------------------------------------
 
 project(
-	hello-world
+	test-next
 	DESCRIPTION "A simple Hello World application"
 )
 
@@ -73,7 +74,7 @@ add_compile_definitions(
 
 # Options for both compilers and linkers. When using -flto all options
 # must also be passed to the linker.
-set(common_options 
+set(common_options
 
   $<$<C_COMPILER_ID:GNU,Clang,AppleClang>:-fmessage-length=0>
   $<$<C_COMPILER_ID:GNU,Clang,AppleClang>:-fsigned-char>
@@ -129,8 +130,7 @@ target_sources(
   application
 
   PRIVATE
-    ${xpack_project_folder}/src/hello-world.cpp
-    ${xpack_project_folder}/libs/adder/src/add.c
+    ${xpack_project_folder}/src/test-next.cpp
 )
 
 # Application includes.
@@ -139,7 +139,14 @@ target_include_directories(
 
   PRIVATE
     ${xpack_project_folder}/include
-    ${xpack_project_folder}/libs/adder/include
+)
+
+# -----------------------------------------------------------------------------
+
+install(
+  PROGRAMS
+    "${CMAKE_CURRENT_BINARY_DIR}/test-next"
+  DESTINATION "bin"
 )
 
 # -----------------------------------------------------------------------------
