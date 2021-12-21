@@ -126,6 +126,8 @@ function copy_dependencies_recursive()
     exit 1
   fi
 
+  local realpath=${REALPATH:-$(which realpath)}
+
   (
     # set -x
 
@@ -147,7 +149,7 @@ function copy_dependencies_recursive()
 
     # Assume a regular file. Later changed if link.
     local actual_source_file_path="${source_file_path}"
-    local actual_destination_file_path="$(realpath ${destination_folder_path})/${source_file_name}"
+    local actual_destination_file_path="$(${realpath} ${destination_folder_path})/${source_file_name}"
 
     # echo "I. Processing ${source_file_path} itself..."
 
@@ -167,7 +169,7 @@ function copy_dependencies_recursive()
         actual_destination_file_path="${destination_folder_path}/${actual_source_file_name}"
         if [ -f "${actual_destination_file_path}" ]
         then
-          actual_destination_file_path="$(realpath "${actual_destination_file_path}")"
+          actual_destination_file_path="$(${realpath} "${actual_destination_file_path}")"
         fi
 
         install_elf "${actual_source_file_path}" "${actual_destination_file_path}"
@@ -387,14 +389,14 @@ function copy_dependencies_recursive()
                 echo_develop "maybe ${maybe_file_path}"
                 if [ -f "${maybe_file_path}" ]
                 then
-                  found_absolute_lib_path="$(realpath ${maybe_file_path})"
+                  found_absolute_lib_path="$(${realpath} ${maybe_file_path})"
                   break
                 fi
                 maybe_file_path="${actual_destination_folder_path}/${lc_rpath:${#loader_prefix}}/${file_relative_path}"
                 echo_develop "maybe ${maybe_file_path}"
                 if [ -f "${maybe_file_path}" ]
                 then
-                  found_absolute_lib_path="$(realpath ${maybe_file_path})"
+                  found_absolute_lib_path="$(${realpath} ${maybe_file_path})"
                   break
                 fi
                 continue
@@ -406,7 +408,7 @@ function copy_dependencies_recursive()
               fi
               if [ -f "${lc_rpath}/${file_relative_path}" ]
               then
-                found_absolute_lib_path="$(realpath ${lc_rpath}/${file_relative_path})"
+                found_absolute_lib_path="$(${realpath} ${lc_rpath}/${file_relative_path})"
                 break
               fi
             done
@@ -468,7 +470,7 @@ function copy_dependencies_recursive()
             "${actual_destination_file_path}"
         fi
 
-        local relative_folder_path="$(realpath --relative-to="${actual_destination_folder_path}" "${APP_PREFIX}/libexec")"
+        local relative_folder_path="$(${realpath} --relative-to="${actual_destination_folder_path}" "${APP_PREFIX}/libexec")"
         patch_macos_elf_add_rpath \
           "${actual_destination_file_path}" \
           "${loader_prefix}${relative_folder_path}"
@@ -548,12 +550,12 @@ function copy_dependencies_recursive()
         (
           cd "${destination_folder_path}"
 
-          local link_relative_path="$(realpath --relative-to="${destination_folder_path}" "${copied_file_path}")"
+          local link_relative_path="$(${realpath} --relative-to="${destination_folder_path}" "${copied_file_path}")"
           run_verbose ln -s "${link_relative_path}" "${source_file_name}"
         )
       fi
 
-      local actual_destination_file_path="$(realpath "${destination_folder_path}/${source_file_name}")"
+      local actual_destination_file_path="$(${realpath} "${destination_folder_path}/${source_file_name}")"
       local actual_destination_folder_path="$(dirname "${actual_destination_file_path}")"
 
       # echo "II. Processing ${source_file_path} dependencies..."
@@ -1598,7 +1600,8 @@ function is_darwin_dylib()
   # Follow symlinks.
   if [ -L "${bin_path}" ]
   then
-    real_path="$(realpath "${bin_path}")"
+    local realpath=${REALPATH:-$(which realpath)}
+    real_path="$(${realpath} "${bin_path}")"
   else
     real_path="${bin_path}"
   fi
@@ -2176,7 +2179,8 @@ function compute_origin_relative_to_libexec()
 
   local folder_path="$1"
 
-  local relative_folder_path="$(realpath --relative-to="${folder_path}" "${APP_PREFIX}/libexec")"
+  local realpath=${REALPATH:-$(which realpath)}
+  local relative_folder_path="$(${realpath} --relative-to="${folder_path}" "${APP_PREFIX}/libexec")"
 
   echo "\$ORIGIN/${relative_folder_path}"
 }
