@@ -819,6 +819,22 @@ function is_darwin_allowed_sys_dylib()
   return 1 # False
 }
 
+
+function install_elf()
+{
+  local source_file_path="$1"
+  local destination_file_path="$2"
+
+  if [ ! -f "${destination_file_path}" ]
+  then
+    if [ ! -d "$(dirname "${destination_file_path}")" ]
+    then
+      run_verbose install -d -m 755 "$(dirname "${destination_file_path}")"
+    fi
+    run_verbose install -c -m 755 "${source_file_path}" "${destination_file_path}"
+  fi
+}
+
 # -----------------------------------------------------------------------------
 
 function strip_binaries()
