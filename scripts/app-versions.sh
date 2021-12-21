@@ -13,6 +13,7 @@
 # -----------------------------------------------------------------------------
 
 source "${helper_folder_path}/projects/patchelf.sh"
+source "${helper_folder_path}/projects/realpath.sh"
 
 # -----------------------------------------------------------------------------
 
@@ -58,6 +59,16 @@ function build_versions()
         export PATCHELF="${LIBS_INSTALL_FOLDER_PATH}/bin/patchelf"
       else
         echo "local patchelf not found"
+        exit 1
+      fi
+    elif [ "${TARGET_PLATFORM}" == "darwin" ]
+    then
+      build_realpath "1.0.0"
+      if [ -x "${LIBS_INSTALL_FOLDER_PATH}/bin/realpath" ]
+      then
+        export REALPATH="${LIBS_INSTALL_FOLDER_PATH}/bin/realpath"
+      else
+        echo "local realpath not found"
         exit 1
       fi
     fi
