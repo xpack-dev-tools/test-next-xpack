@@ -136,9 +136,9 @@ function download_and_extract()
     download "${url}" "${archive_name}"
     if [ $# -ge 4 ]
     then
-      extract "${DOWNLOAD_FOLDER_PATH}/${archive_name}" "${folder_name}" "$4"
+      extract "${CACHE_FOLDER_PATH}/${archive_name}" "${folder_name}" "$4"
     else
-      extract "${DOWNLOAD_FOLDER_PATH}/${archive_name}" "${folder_name}"
+      extract "${CACHE_FOLDER_PATH}/${archive_name}" "${folder_name}"
     fi
 
     chmod -R +w "${folder_name}" || true
