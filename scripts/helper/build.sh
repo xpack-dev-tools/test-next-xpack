@@ -47,11 +47,16 @@ helper_folder_path="${scripts_folder_path}/helper"
 
 # -----------------------------------------------------------------------------
 
-source "${scripts_folder_path}/app-defs-source.sh"
+source "${scripts_folder_path}/app-definitions.sh"
 
-source "${helper_folder_path}/pre-functions-source.sh"
-source "${helper_folder_path}/misc-functions-source.sh"
-source "${helper_folder_path}/post-functions-source.sh"
+# Helper first.
+source "${helper_folder_path}/init-functions.sh"
+source "${helper_folder_path}/misc-functions.sh"
+source "${helper_folder_path}/post-functions.sh"
+
+# Applications may redefine helper functions.
+source "${scripts_folder_path}/app-functions.sh"
+source "${scripts_folder_path}/app-versions.sh"
 
 # -----------------------------------------------------------------------------
 
@@ -206,7 +211,7 @@ identify_host
 
 set_build_env
 
-set_compiler_env
+# set_compiler_env
 
 # -----------------------------------------------------------------------------
 
@@ -218,38 +223,12 @@ tests_initialize
 
 build_versions
 
-# -----------------------------------------------------------------------------
-
-if [ ! "${TEST_ONLY}" == "y" ]
-then
-  (
-    if [ "${TARGET_PLATFORM}" == "win32" ]
-    then
-      # The Windows still has a reference to libgcc_s and libwinpthread
-      export DO_COPY_GCC_LIBS="y"
-    fi
-
-    prepare_app_folder_libraries
-
-    # strip_libs
-    strip_binaries
-
-    copy_distro_files
-    copy_custom_files
-
-    check_binaries
-
-    create_archive
-
-    # Change ownership to non-root Linux user.
-    fix_ownership
-  )
-fi
+post_process
 
 # -----------------------------------------------------------------------------
 
 # Final checks.
-# To keep everything as pristine as possible, run tests
+# To keep everything as pristine as possible, run the tests
 # only after the archive is packed.
 
 prime_wine
