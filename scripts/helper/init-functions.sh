@@ -249,8 +249,6 @@ function set_build_env()
 
   CACHE_FOLDER_PATH=${CACHE_FOLDER_PATH:-"${HOME}/Work/cache"}
 
-  copy_build_git
-
   # ---------------------------------------------------------------------------
 
   export BUILD

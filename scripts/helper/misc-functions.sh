@@ -785,19 +785,4 @@ function copy_dir()
   set -u
 }
 
-# Copy the build files to the Work area, to make them easily available.
-function copy_build_git()
-{
-  if [ -d "${BUILD_GIT_PATH}" ]
-  then
-    chmod -R +w "${BUILD_GIT_PATH}"
-    rm -rf "${BUILD_GIT_PATH}"
-  fi
-  mkdir -pv "${BUILD_GIT_PATH}"
-  echo ${scripts_folder_path}
-  cp -r "$(dirname ${scripts_folder_path})/scripts" "${BUILD_GIT_PATH}"
-  rm -rf "${BUILD_GIT_PATH}/scripts/helper/.git"
-  rm -rf "${BUILD_GIT_PATH}/scripts/helper/build-helper.sh"
-}
-
 # -----------------------------------------------------------------------------
