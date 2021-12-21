@@ -68,7 +68,7 @@
       "LIQUIDJS": "liquidjs '{ \"APP_NAME\": \"{{ properties.appName }}\", \"APP_LC_NAME\": \"{{ properties.appLCName }}\", \"platforms\": \"{{ properties.platforms }}\" }'",
       "buildFolderRelativePath": "{{ 'targets' | path_join: configuration.name | to_filename | downcase }}",
       "buildFolderPath": "$(pwd)/{{ properties.buildFolderRelativePath }}",
-      "commandBuild": "bash scripts/helper/build.sh --build-folder \"{{ properties.buildFolderPath }}\"",
+      "commandBuild": "bash scripts/helper/build.sh --target-folder \"{{ properties.buildFolderPath }}\"",
       "commandBuildWithTarget": "bash scripts/helper/build.sh --target-folder \"{{ properties.buildFolderPath }}\" --target {{ configuration.name }}",
       "commandClean": "rm -rf \"{{ properties.buildFolderPath }}\""
     },
@@ -105,7 +105,7 @@
       "debug": {
         "actions": {
           "build": [
-            "{{ properties.commandBuild }} --debug"
+            "{{ properties.commandBuild }} --debug --develop"
           ],
           "clean": [
             "{{ properties.commandClean }}"
@@ -116,6 +116,9 @@
         "actions": {
           "build": [
             "{{ properties.commandBuild }}"
+          ],
+          "build-develop": [
+            "{{ properties.commandBuild }} --develop"
           ],
           "clean": [
             "{{ properties.commandClean }}"
