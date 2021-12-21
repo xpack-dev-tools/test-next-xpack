@@ -12,6 +12,10 @@
 
 # -----------------------------------------------------------------------------
 
+source "${helper_folder_path}/projects/patchelf.sh"
+
+# -----------------------------------------------------------------------------
+
 function build_versions()
 {
   TEST_NEXT_VERSION="$(echo "${RELEASE_VERSION}" | sed -e 's|-.*||')"
@@ -45,6 +49,18 @@ function build_versions()
 
   if [[ "${RELEASE_VERSION}" =~ 1\.2\.3-.* ]]
   then
+
+    if [ "${TARGET_PLATFORM}" == "linux" ]
+    then
+      build_patchelf "0.14.3"
+      if [ -x "${LIBS_INSTALL_FOLDER_PATH}/bin/patchelf" ]
+      then
+        export PATCHELF="${LIBS_INSTALL_FOLDER_PATH}/bin/patchelf"
+      else
+        echo "local patchelf not found"
+        exit 1
+      fi
+    fi
 
     build_test_next "${TEST_NEXT_VERSION}"
 
