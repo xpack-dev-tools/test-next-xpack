@@ -33,6 +33,13 @@ git clone \
 git -C ~/Downloads/test-next-xpack.git submodule update --init --recursive
 ```
 
+## Install dependencies
+
+```sh
+cd ~/Downloads/test-next-xpack.git
+xpm install
+```
+
 ## Build
 
 ```console
