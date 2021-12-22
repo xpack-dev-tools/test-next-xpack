@@ -62,6 +62,8 @@ source "${scripts_folder_path}/app-versions.sh"
 
 set_xpack_defaults
 
+RELEASE_VERSION="${RELEASE_VERSION:-$(get_current_version)}"
+
 TARGET_FOLDER_PATH="${TARGET_FOLDER_PATH:=""}"
 # target-arch, using Node.js semantics.
 TARGET_PAIR="${TARGET_PAIR:=""}"

@@ -240,8 +240,6 @@ function set_build_env()
     WITH_UPDATE_CONFIG_SUB=${WITH_UPDATE_CONFIG_SUB:-""}
   fi
 
-  RELEASE_VERSION="${RELEASE_VERSION:-$(get_current_version)}"
-
   TARGET_FOLDER_NAME="${TARGET_PLATFORM}-${TARGET_ARCH}"
 
   # Use the UTC date as version in the name of the distribution file.
