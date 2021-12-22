@@ -224,7 +224,7 @@ function set_build_env()
 
   DISTRO_INFO_NAME=${DISTRO_INFO_NAME:-"distro-info"}
 
-  BUILD_GIT_PATH="${TARGET_FOLDER_PATH}/build.git"
+  BUILD_GIT_PATH="$(dirname ${scripts_folder_path})"
 
   APP_PREFIX="${INSTALL_FOLDER_PATH}/${APP_LC_NAME}"
   # Use with --docdir, --mandir, --infodir, --htmldir, --pdfdir.
