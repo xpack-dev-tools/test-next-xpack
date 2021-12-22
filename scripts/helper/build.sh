@@ -110,7 +110,12 @@ do
   case "$1" in
 
     --target-folder)
-      TARGET_FOLDER_PATH="$2"
+      if [ -z ${WORK_FOLDER_PATH+x} ]
+      then
+        TARGET_FOLDER_PATH="$2"
+      else
+        TARGET_FOLDER_PATH="${WORK_FOLDER_PATH}/${APP_LC_NAME}-${RELEASE_VERSION}/$(basename "$2")"
+      fi
       shift 2
       ;;
 
