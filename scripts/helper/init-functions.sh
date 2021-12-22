@@ -219,7 +219,7 @@ function set_build_env()
   mkdir -pv "${LOGS_FOLDER_PATH}"
 
   DEPLOY_FOLDER_NAME=${DEPLOY_FOLDER_NAME:-"deploy"}
-  DEPLOY_FOLDER_PATH="$(dirname "${scripts_folder_path}")/${DEPLOY_FOLDER_NAME}"
+  DEPLOY_FOLDER_PATH="$(dirname "${TARGET_FOLDER_PATH}")/${DEPLOY_FOLDER_NAME}"
   mkdir -pv "${DEPLOY_FOLDER_PATH}"
 
   DISTRO_INFO_NAME=${DISTRO_INFO_NAME:-"distro-info"}
