@@ -11,11 +11,11 @@ Git repo.
 To download them, issue the following commands:
 
 ```sh
-rm -rf ~/Downloads/test-next-xpack.git; \
+rm -rf ${HOME}/Work/test-next-xpack.git; \
 git clone \
   https://github.com/xpack-dev-tools/test-next-xpack.git \
-  ~/Downloads/test-next-xpack.git; \
-git -C ~/Downloads/test-next-xpack.git submodule update --init --recursive
+  ${HOME}/Work/test-next-xpack.git; \
+git -C ${HOME}/Work/test-next-xpack.git submodule update --init --recursive
 ```
 
 > Note: the repository uses submodules; for a successful build it is
@@ -25,18 +25,18 @@ For development purposes, clone the `xpack-develop`
 branch:
 
 ```sh
-rm -rf ~/Downloads/test-next-xpack.git; \
+rm -rf ${HOME}/Work/test-next-xpack.git; \
 git clone \
   --branch xpack-develop \
   https://github.com/xpack-dev-tools/test-next-xpack.git \
-  ~/Downloads/test-next-xpack.git; \
-git -C ~/Downloads/test-next-xpack.git submodule update --init --recursive
+  ${HOME}/Work/test-next-xpack.git; \
+git -C ${HOME}/Work/test-next-xpack.git submodule update --init --recursive
 ```
 
 ## Install dependencies
 
 ```sh
-cd ~/Downloads/test-next-xpack.git
+cd ${HOME}/Work/test-next-xpack.git
 xpm install
 ```
 
